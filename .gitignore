@@ -4,3 +4,10 @@ tcardgen
 *.png
 *.ttf
 !example/*.png
+
+# dev
+.devcontainer
+Dockerfile
+
+# other
+.DS_Store
