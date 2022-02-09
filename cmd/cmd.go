@@ -192,13 +192,15 @@ func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily
 	); err != nil {
 		return err
 	}
-	if err := c.DrawTextAtPoint(
-		strings.ToUpper(fm.Category),
-		*cnf.Category.Start,
-		canvas.FgHexColor(cnf.Category.FgHexColor),
-		canvas.FontFaceFromFFA(ffa, cnf.Category.FontStyle, cnf.Category.FontSize),
-	); err != nil {
-		return err
+	if fm.Category != "" {
+		if err := c.DrawTextAtPoint(
+			strings.ToUpper(fm.Category),
+			*cnf.Category.Start,
+			canvas.FgHexColor(cnf.Category.FgHexColor),
+			canvas.FontFaceFromFFA(ffa, cnf.Category.FontStyle, cnf.Category.FontSize),
+		); err != nil {
+			return err
+		}
 	}
 	if err := c.DrawTextAtPoint(
 		fmt.Sprintf("%s%s%s", fm.Author, cnf.Info.Separator, fm.Date.Format("Jan 2")),
