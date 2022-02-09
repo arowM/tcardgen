@@ -54,11 +54,11 @@ func parseFrontMatter(r io.Reader) (*FrontMatter, error) {
 			return nil, err
 		}
 	} else {
-		if fm.Author, err = getString(&cfm, fmAuthor); err != nil {
+		if fm.Author, err = wrapGetString(getString(&cfm, fmAuthor)); err != nil {
 			return nil, err
 		}
 	}
-	if fm.Category, err = getFirstStringItem(&cfm, fmCategories); err != nil {
+	if fm.Category, err = wrapGetFirstStringItem(getFirstStringItem(&cfm, fmCategories)); err != nil {
 		return nil, err
 	}
 	if fm.Tags, err = getAllStringItems(&cfm, fmTags); err != nil {
@@ -99,6 +99,18 @@ func getTime(cfm *pageparser.ContentFrontMatter, fmKey string) (time.Time, error
 	default:
 		return time.Now(), NewFMInvalidTypeError(fmKey, "time.Time or string", t)
 	}
+}
+
+func wrapGetString(got string, err error) (string, error) {
+	if err == nil {
+		return got, nil
+	}
+	if err, ok := err.(*FMNotExistError); !ok {
+		return got, err
+	} else if err.Key == fmAuthor {
+		return "", nil
+	}
+	return got, err
 }
 
 func getString(cfm *pageparser.ContentFrontMatter, fmKey string) (string, error) {
@@ -145,6 +157,18 @@ func getAllStringItems(cfm *pageparser.ContentFrontMatter, fmKey string) ([]stri
 	default:
 		return nil, NewFMInvalidTypeError(fmKey, "[]interface{}", arr)
 	}
+}
+
+func wrapGetFirstStringItem(got string, err error) (string, error) {
+	if err == nil {
+		return got, nil
+	}
+	if err, ok := (err).(*FMNotExistError); !ok {
+		return got, err
+	} else if err.Key == fmCategories {
+		return "", nil
+	}
+	return got, err
 }
 
 func getFirstStringItem(cfm *pageparser.ContentFrontMatter, fmKey string) (string, error) {
