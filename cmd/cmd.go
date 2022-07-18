@@ -56,6 +56,7 @@ type RootCommandOption struct {
 	tplImg  string
 	config  string
 	author  string
+  maxTitle int
 }
 
 func NewRootCmd() *cobra.Command {
@@ -86,6 +87,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&opt.tplImg, "template", "t", "", fmt.Sprintf("Set a template image file. (default %s)", config.DefaultTemplate))
 	cmd.Flags().StringVarP(&opt.config, "config", "c", "", "Set a drawing configuration file.")
 	cmd.Flags().StringVarP(&opt.author, "author", "a", "", "Set a default author.")
+	cmd.Flags().IntVarP(&opt.maxTitle, "maxTitle", "x", -1, "Set a maximum title length.")
 	return cmd
 }
 
@@ -149,7 +151,7 @@ func (o *RootCommandOption) Run(streams IOStreams) error {
 			out += fmt.Sprintf("/%s.png", base[:len(base)-len(filepath.Ext(base))])
 		}
 
-		if err := generateTCard(f, out, tpl, ffa, cnf, o.author); err != nil {
+		if err := generateTCard(f, out, tpl, ffa, cnf, o.author, o.maxTitle); err != nil {
 			fmt.Fprintf(streams.ErrOut, "Failed to generate twitter card for %v: %v\n", out, err)
 			errCnt++
 			continue
@@ -163,7 +165,7 @@ func (o *RootCommandOption) Run(streams IOStreams) error {
 	return nil
 }
 
-func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily.FontFamily, cnf *config.DrawingConfig, author string) error {
+func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily.FontFamily, cnf *config.DrawingConfig, author string, maxTitle int) error {
 	fm, err := hugo.CustomParseFrontMatter(contentPath)
 	if err != nil {
 		return err
@@ -171,6 +173,12 @@ func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily
 	if fm.Author == "" {
 		fm.Author = author
 	}
+  if maxTitle > -1 {
+    tmpTitle := string([]rune(fm.Title)[:maxTitle])
+    if (fm.Title != tmpTitle) {
+      fm.Title = tmpTitle + "..."
+    }
+  }
 
 	c, err := canvas.CreateCanvasFromImage(tpl)
 	if err != nil {
