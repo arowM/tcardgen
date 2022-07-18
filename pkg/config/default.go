@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/qawatake/tcardgen/pkg/canvas/box"
-	"github.com/qawatake/tcardgen/pkg/canvas/fontfamily"
+	"github.com/arowM/tcardgen/pkg/canvas/box"
+	"github.com/arowM/tcardgen/pkg/canvas/fontfamily"
 )
 
 const DefaultTemplate = "example/template.png"
