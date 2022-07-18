@@ -174,9 +174,9 @@ func generateTCard(contentPath, outPath string, tpl image.Image, ffa *fontfamily
 		fm.Author = author
 	}
   if maxTitle > -1 {
-    tmpTitle := string([]rune(fm.Title)[:maxTitle])
-    if (fm.Title != tmpTitle) {
-      fm.Title = tmpTitle + "..."
+    r := []rune(fm.Title)
+    if len(r) > maxTitle {
+      fm.Title = string(r[:maxTitle]) + "..."
     }
   }
 
